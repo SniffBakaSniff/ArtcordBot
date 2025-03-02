@@ -69,7 +69,7 @@ namespace ArtcordBot
                 
                 new CommandsConfiguration()
                 {
-                    DebugGuildId = 1219490918235901962,
+                    DebugGuildId = 1345544197310255134,
                     RegisterDefaultCommandProcessors = true,
                     UseDefaultCommandErrorHandler = false
                 }
