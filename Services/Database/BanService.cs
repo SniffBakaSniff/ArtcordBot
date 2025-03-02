@@ -14,25 +14,33 @@ namespace ArtcordBot.Services.Database
             DateTime? appealDate = null,
             string? internalNotes = null)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var newBanRecord = new BanRecords
+                using (var dbContext = new BotDbContext())
                 {
-                    GuildId = guildId,
-                    UserId = userId,
-                    ModeratorId = moderatorId,
-                    Reason = reason,
-                    ReferenceImagePath = referenceImagePath,
-                    ReferenceMessageId = referenceMessageId,
-                    BanDate = DateTime.UtcNow,
-                    ExpirationDate = expirationDate,
-                    AppealStatus = appealStatus,
-                    AppealDate = appealDate,
-                    InternalNotes = internalNotes
-                };
+                    var newBanRecord = new BanRecords
+                    {
+                        GuildId = guildId,
+                        UserId = userId,
+                        ModeratorId = moderatorId,
+                        Reason = reason,
+                        ReferenceImagePath = referenceImagePath,
+                        ReferenceMessageId = referenceMessageId,
+                        BanDate = DateTime.UtcNow,
+                        ExpirationDate = expirationDate,
+                        AppealStatus = appealStatus,
+                        AppealDate = appealDate,
+                        InternalNotes = internalNotes
+                    };
 
-                dbContext.BanRecords.Add(newBanRecord);
-                await dbContext.SaveChangesAsync();
+                    dbContext.BanRecords.Add(newBanRecord);
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in NewBanRecordAsync: {ex.Message}");
             }
         }
     }

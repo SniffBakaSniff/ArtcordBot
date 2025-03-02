@@ -8,7 +8,6 @@ using DSharpPlus.Commands.Processors.TextCommands.Parsing;
 using ArtcordBot.Features.ConfigCommands;
 using ArtcordBot.Features.ModerationCommands;
 using ArtcordBot.Listeners;
-using System.Runtime.CompilerServices;
 using ArtcordBot.Services.Database;
 
 namespace ArtcordBot

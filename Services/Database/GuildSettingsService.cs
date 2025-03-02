@@ -4,86 +4,163 @@ namespace ArtcordBot.Services.Database
     {
         public async Task<ulong?> GetLogsChannelAsync(ulong guildId)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await dbContext.GuildSettings.FindAsync(guildId);
-                return settings?.LogsChannelId;
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await dbContext.GuildSettings.FindAsync(guildId);
+                    return settings?.LogsChannelId;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in GetLogsChannelAsync: {ex.Message}");
+                return null;
             }
         }
 
         public async Task<string> GetPrefixAsync(ulong guildId)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await dbContext.GuildSettings.FindAsync(guildId);
-                return settings?.Prefix ?? "!";
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await dbContext.GuildSettings.FindAsync(guildId);
+                    return settings?.Prefix ?? "!";
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in GetPrefixAsync: {ex.Message}");
+                return "!";
             }
         }
 
         public async Task SetPrefixAsync(ulong guildId, string prefix)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await GuildSettingsAsync(dbContext, guildId);
-                settings.Prefix = prefix;
-                await dbContext.SaveChangesAsync();
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await GuildSettingsAsync(dbContext, guildId);
+                    settings.Prefix = prefix;
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in SetPrefixAsync: {ex.Message}");
             }
         }
 
         public async Task<ulong?> GetMutedRoleAsync(ulong guildId)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await dbContext.GuildSettings.FindAsync(guildId);
-                return settings?.MutedRoleId;
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await dbContext.GuildSettings.FindAsync(guildId);
+                    return settings?.MutedRoleId;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in GetMutedRoleAsync: {ex.Message}");
+                return null;
             }
         }
 
         public async Task SetMutedRoleAsync(ulong guildId, ulong? mutedRoleId)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await GuildSettingsAsync(dbContext, guildId);
-                settings.MutedRoleId = mutedRoleId;
-                await dbContext.SaveChangesAsync();
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await GuildSettingsAsync(dbContext, guildId);
+                    settings.MutedRoleId = mutedRoleId;
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in SetMutedRoleAsync: {ex.Message}");
             }
         }
 
         public async Task<ulong?> GetWelcomeChannelAsync(ulong guildId)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await GuildSettingsAsync(dbContext, guildId);
-                return settings?.WelcomeChannelId;
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await GuildSettingsAsync(dbContext, guildId);
+                    return settings?.WelcomeChannelId;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in GetWelcomeChannelAsync: {ex.Message}");
+                return null;
             }
         }
 
         public async Task SetWelcomeChannelAsync(ulong guildId, ulong? welcomeChannelId)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await GuildSettingsAsync(dbContext, guildId);
-                settings!.WelcomeChannelId = welcomeChannelId;
-                await dbContext.SaveChangesAsync();
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await GuildSettingsAsync(dbContext, guildId);
+                    settings!.WelcomeChannelId = welcomeChannelId;
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in SetWelcomeChannelAsync: {ex.Message}");
             }
         }
 
         public async Task<ulong?> GetFarewellChannelAsync(ulong guildId)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await GuildSettingsAsync(dbContext, guildId);
-                return settings?.FarewellChannelId;
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await GuildSettingsAsync(dbContext, guildId);
+                    return settings?.FarewellChannelId;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in GetFarewellChannelAsync: {ex.Message}");
+                return null;
             }
         }
 
         public async Task SetFarewellChannelAsync(ulong guildId, ulong? farewellChannelId)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await GuildSettingsAsync(dbContext, guildId);
-                settings!.FarewellChannelId = farewellChannelId;
-                await dbContext.SaveChangesAsync();
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await GuildSettingsAsync(dbContext, guildId);
+                    settings!.FarewellChannelId = farewellChannelId;
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in SetFarewellChannelAsync: {ex.Message}");
             }
         }
 

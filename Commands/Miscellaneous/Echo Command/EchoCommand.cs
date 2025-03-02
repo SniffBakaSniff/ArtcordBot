@@ -1,5 +1,4 @@
-﻿
-using ArtcordBot.Helpers;
+﻿using ArtcordBot.Helpers;
 using DSharpPlus.Commands;
 using DSharpPlus.Entities;
 
@@ -14,10 +13,7 @@ namespace ArtcordBot.Features
             [System.ComponentModel.Description("The message to be sent")] string message,
             [System.ComponentModel.Description("The channel the message should be sent (current channel by default)")] DiscordChannel? channel = null)
         {
-            if (channel == null)
-            {
-                return context.RespondAsync(message);
-            }
+            channel ??= context.Channel;
 
             channel.SendMessageAsync(message);
 
@@ -58,11 +54,7 @@ namespace ArtcordBot.Features
 
             DiscordEmbed embed = embedBuilder.Build();
 
-            if (channel == null)
-            {
-                return context.RespondAsync(embed);
-            }
-
+            channel ??= context.Channel;
 
             channel.SendMessageAsync(embed);
 

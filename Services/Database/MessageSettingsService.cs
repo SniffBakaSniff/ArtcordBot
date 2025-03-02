@@ -4,71 +4,79 @@ namespace ArtcordBot.Services.Database
     {
         public async Task<string?> ManageMessageSettingAsync(ulong guildId, string messageType, string? newMessage = null)
         {
-            using (var dbContext = new BotDbContext())
+            try
             {
-                var settings = await GuildMessageSettingsAsync(dbContext, guildId);
-
-                switch (messageType.ToLower())
+                using (var dbContext = new BotDbContext())
                 {
-                    case "appeal":
-                        if (newMessage != null)
-                        {
-                            settings.AppealMessage = newMessage;
-                            await dbContext.SaveChangesAsync();
-                        }
-                        return settings.AppealMessage;
+                    var settings = await GuildMessageSettingsAsync(dbContext, guildId);
 
-                    case "welcome":
-                        if (newMessage != null)
-                        {
-                            settings.WelcomeMessage = newMessage;
-                            await dbContext.SaveChangesAsync();
-                        }
-                        return settings.WelcomeMessage;
+                    switch (messageType.ToLower())
+                    {
+                        case "appeal":
+                            if (newMessage != null)
+                            {
+                                settings.AppealMessage = newMessage;
+                                await dbContext.SaveChangesAsync();
+                            }
+                            return settings.AppealMessage;
 
-                    case "farewell":
-                        if (newMessage != null)
-                        {
-                            settings.FarewellMessage = newMessage;
-                            await dbContext.SaveChangesAsync();
-                        }
-                        return settings.FarewellMessage;
+                        case "welcome":
+                            if (newMessage != null)
+                            {
+                                settings.WelcomeMessage = newMessage;
+                                await dbContext.SaveChangesAsync();
+                            }
+                            return settings.WelcomeMessage;
 
-                    case "mutednotification":
-                        if (newMessage != null)
-                        {
-                            settings.MutedNotificationMessage = newMessage;
-                            await dbContext.SaveChangesAsync();
-                        }
-                        return settings.MutedNotificationMessage;
+                        case "farewell":
+                            if (newMessage != null)
+                            {
+                                settings.FarewellMessage = newMessage;
+                                await dbContext.SaveChangesAsync();
+                            }
+                            return settings.FarewellMessage;
 
-                    case "ticketcreation":
-                        if (newMessage != null)
-                        {
-                            settings.TicketCreationMessage = newMessage;
-                            await dbContext.SaveChangesAsync();
-                        }
-                        return settings.TicketCreationMessage;
+                        case "mutednotification":
+                            if (newMessage != null)
+                            {
+                                settings.MutedNotificationMessage = newMessage;
+                                await dbContext.SaveChangesAsync();
+                            }
+                            return settings.MutedNotificationMessage;
 
-                    case "ticketclosure":
-                        if (newMessage != null)
-                        {
-                            settings.TicketClosureMessage = newMessage;
-                            await dbContext.SaveChangesAsync();
-                        }
-                        return settings.TicketClosureMessage;
-                        
+                        case "ticketcreation":
+                            if (newMessage != null)
+                            {
+                                settings.TicketCreationMessage = newMessage;
+                                await dbContext.SaveChangesAsync();
+                            }
+                            return settings.TicketCreationMessage;
 
-                    case "error":
-                        if (newMessage != null)
-                        {
-                            settings.ErrorMessage = newMessage;
-                        }
-                        return settings.ErrorMessage;
+                        case "ticketclosure":
+                            if (newMessage != null)
+                            {
+                                settings.TicketClosureMessage = newMessage;
+                                await dbContext.SaveChangesAsync();
+                            }
+                            return settings.TicketClosureMessage;
 
-                    default:
-                        throw new ArgumentException("Invalid message type specified.");
+                        case "error":
+                            if (newMessage != null)
+                            {
+                                settings.ErrorMessage = newMessage;
+                            }
+                            return settings.ErrorMessage;
+
+                        default:
+                            throw new ArgumentException("Invalid message type specified.");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in ManageMessageSettingAsync: {ex.Message}");
+                return null;
             }
         }
 
