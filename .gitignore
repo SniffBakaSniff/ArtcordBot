@@ -8,3 +8,4 @@ appsettings.json
 *.db-wal
 *.db-shm
 fileStructure.py
+/Database/Migrations

@@ -1,4 +1,5 @@
 using ArtcordBot.Helpers;
+using ArtcordBot.Services.Database;
 using DSharpPlus.Commands;
 
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace ArtcordBot.Features.ConfigCommands
                 return;
             }
 
-            await _messageSettingsService.ManageMessageSettingAsync(ctx.Guild!.Id, "welcome", welcomeMessage);
+            await _messageSettingsService.ManageMessageSettingAsync(ctx.Guild!.Id, MessageType.Welcome, welcomeMessage);
             await ctx.RespondAsync(
                 MessageHelpers.GenericUpdateEmbed("Welcome Message Updated!\n", extra: welcomeMessage)
             );
@@ -34,7 +35,7 @@ namespace ArtcordBot.Features.ConfigCommands
                 return;
             }
 
-            await _messageSettingsService.ManageMessageSettingAsync(ctx.Guild!.Id, "farewell", farewellMessage);
+            await _messageSettingsService.ManageMessageSettingAsync(ctx.Guild!.Id, MessageType.Farewell, farewellMessage);
             await ctx.RespondAsync(
                 MessageHelpers.GenericUpdateEmbed("Farewell Message Updated!\n", extra: farewellMessage)
             );

@@ -13,7 +13,7 @@ public class CustomPrefixResolver : IPrefixResolver
 
     public async ValueTask<int> ResolvePrefixAsync(CommandsExtension extension, DiscordMessage message)
     {
-        if (string.IsNullOrWhiteSpace(message.Content) || message.Channel! == null!)
+        if (string.IsNullOrWhiteSpace(message.Content) || message.Channel is null)
         {
             return -1;
         }

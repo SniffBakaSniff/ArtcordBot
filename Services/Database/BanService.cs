@@ -14,7 +14,7 @@ namespace ArtcordBot.Services.Database
             DateTime? appealDate = null,
             string? internalNotes = null)
         {
-            try
+            await ExceptionHandler.HandleAsync(async () =>
             {
                 using (var dbContext = new BotDbContext())
                 {
@@ -36,12 +36,7 @@ namespace ArtcordBot.Services.Database
                     dbContext.BanRecords.Add(newBanRecord);
                     await dbContext.SaveChangesAsync();
                 }
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error in NewBanRecordAsync: {ex.Message}");
-            }
+            });
         }
     }
 }

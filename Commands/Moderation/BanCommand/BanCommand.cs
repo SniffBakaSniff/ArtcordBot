@@ -1,7 +1,6 @@
 using DSharpPlus.Commands;
 using DSharpPlus.Entities;
 using DSharpPlus.Commands.ContextChecks;
-using DSharpPlus.EventArgs;
 using System.ComponentModel;
 using DSharpPlus;
 
@@ -57,6 +56,7 @@ namespace ArtcordBot.Features.ModerationCommands
 
             reason ??= "No reason provided.";
 
+            //Commenting out for testing purposes (dont actually wanna ban people yet)
             //await ctx.Guild.BanMemberAsync(targetUser, TimeSpan.FromHours((int)deleteTimeframe), reason);
 
             DateTime adjustedTime = DateTime.UtcNow.AddHours(-(int)deleteTimeframe);
@@ -77,7 +77,7 @@ namespace ArtcordBot.Features.ModerationCommands
                     Url = targetUser.AvatarUrl
                 },
                 Timestamp = DateTime.UtcNow
-            }.AddField("Reason", $"```{reason}```");
+            }.AddField("Reason", $"```\n{reason}\n```");
 
             var dmEmbed = new DiscordEmbedBuilder
             {
@@ -90,7 +90,7 @@ namespace ArtcordBot.Features.ModerationCommands
                     Url = guildIconUrl
                 },
                 Timestamp = DateTime.UtcNow
-            }.AddField("Reason", $"```{reason}```");
+            }.AddField("Reason", $"```\n{reason}\n```");
 
             await targetUser.SendMessageAsync(new DiscordMessageBuilder()
                 .AddEmbeds([dmEmbed.Build()])

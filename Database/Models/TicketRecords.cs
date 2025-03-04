@@ -26,7 +26,7 @@ public class TicketMessages
     public ulong TicketId { get; set; }
     public ulong UserId { get; set; }
     public TicketMessageType MessageType { get; set; }
-    public string Content { get; set; } = null!;
+    public required string Content { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-    public TicketRecords TicketRecords { get; set; } = null!;
+    public TicketRecords? TicketRecords { get; set; }
 }

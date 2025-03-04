@@ -19,7 +19,6 @@ namespace ArtcordBot.Listeners
             var messageType = e.Author.Id == userId ? TicketMessageType.Moderator : TicketMessageType.Submitter;
             if(ticketId.HasValue) 
             {
-                Console.WriteLine(e.Message.Content);
                 await _ticketService.LogTicketMessageAsync(ticketId: ticketId.Value, userId: e.Author.Id, messageType: messageType, content: e.Message.Content);
             }
         }

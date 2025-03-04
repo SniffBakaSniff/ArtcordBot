@@ -1,6 +1,8 @@
+using ArtcordBot.Services.Database;
+
 public interface IMessageSettingsService
 {
-    Task<string?> ManageMessageSettingAsync(ulong guildId, string messageType, string? newMessage = null);
+    Task<string?> ManageMessageSettingAsync(ulong guildId, MessageType messageType, string? newMessage = null);
 }
 
 public interface IGuildSettingsService

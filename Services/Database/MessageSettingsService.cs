@@ -1,18 +1,29 @@
 namespace ArtcordBot.Services.Database
 {
+    public enum MessageType
+    {
+        Appeal,
+        Welcome,
+        Farewell,
+        MutedNotification,
+        TicketCreation,
+        TicketClosure,
+        Error
+    }
+
     public class MessageSettingsService : IMessageSettingsService
     {
-        public async Task<string?> ManageMessageSettingAsync(ulong guildId, string messageType, string? newMessage = null)
+        public async Task<string?> ManageMessageSettingAsync(ulong guildId, MessageType messageType, string? newMessage = null)
         {
-            try
+            return await ExceptionHandler.HandleAsync(async () =>
             {
                 using (var dbContext = new BotDbContext())
                 {
                     var settings = await GuildMessageSettingsAsync(dbContext, guildId);
 
-                    switch (messageType.ToLower())
+                    switch (messageType)
                     {
-                        case "appeal":
+                        case MessageType.Appeal:
                             if (newMessage != null)
                             {
                                 settings.AppealMessage = newMessage;
@@ -20,7 +31,7 @@ namespace ArtcordBot.Services.Database
                             }
                             return settings.AppealMessage;
 
-                        case "welcome":
+                        case MessageType.Welcome:
                             if (newMessage != null)
                             {
                                 settings.WelcomeMessage = newMessage;
@@ -28,7 +39,7 @@ namespace ArtcordBot.Services.Database
                             }
                             return settings.WelcomeMessage;
 
-                        case "farewell":
+                        case MessageType.Farewell:
                             if (newMessage != null)
                             {
                                 settings.FarewellMessage = newMessage;
@@ -36,7 +47,7 @@ namespace ArtcordBot.Services.Database
                             }
                             return settings.FarewellMessage;
 
-                        case "mutednotification":
+                        case MessageType.MutedNotification:
                             if (newMessage != null)
                             {
                                 settings.MutedNotificationMessage = newMessage;
@@ -44,7 +55,7 @@ namespace ArtcordBot.Services.Database
                             }
                             return settings.MutedNotificationMessage;
 
-                        case "ticketcreation":
+                        case MessageType.TicketCreation:
                             if (newMessage != null)
                             {
                                 settings.TicketCreationMessage = newMessage;
@@ -52,7 +63,7 @@ namespace ArtcordBot.Services.Database
                             }
                             return settings.TicketCreationMessage;
 
-                        case "ticketclosure":
+                        case MessageType.TicketClosure:
                             if (newMessage != null)
                             {
                                 settings.TicketClosureMessage = newMessage;
@@ -60,7 +71,7 @@ namespace ArtcordBot.Services.Database
                             }
                             return settings.TicketClosureMessage;
 
-                        case "error":
+                        case MessageType.Error:
                             if (newMessage != null)
                             {
                                 settings.ErrorMessage = newMessage;
@@ -71,13 +82,7 @@ namespace ArtcordBot.Services.Database
                             throw new ArgumentException("Invalid message type specified.");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error in ManageMessageSettingAsync: {ex.Message}");
-                return null;
-            }
+            });
         }
 
         private async Task<GuildMessageSettings> GuildMessageSettingsAsync(BotDbContext dbContext, ulong guildId)

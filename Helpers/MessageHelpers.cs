@@ -1,5 +1,4 @@
 ﻿using DSharpPlus.Entities;
-using System.Threading.Channels;
 
 namespace ArtcordBot.Helpers
 {
@@ -21,7 +20,7 @@ namespace ArtcordBot.Helpers
                 .WithTimestamp(DateTime.UtcNow)
                 .Build();
 
-        public static DiscordEmbed GenericUpdateEmbed(string title, string extra = null!, string color = "#00ffff") => new DiscordEmbedBuilder()
+        public static DiscordEmbed GenericUpdateEmbed(string title, string? extra, string color = "#00ffff") => new DiscordEmbedBuilder()
                 .WithTitle(title)
                 .WithColor(new DiscordColor(color))
                 .WithTimestamp(DateTime.UtcNow)
