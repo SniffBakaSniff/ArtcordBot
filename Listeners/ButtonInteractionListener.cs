@@ -8,11 +8,12 @@ namespace ArtcordBot.Listeners
     {
 
         private readonly ITicketService _ticketService;
+        private readonly IBanService _banService;
 
-
-        public ButtonInteractionListener(ITicketService ticketService)
+        public ButtonInteractionListener(ITicketService ticketService, IBanService banService)
         {
             _ticketService = ticketService ?? throw new ArgumentNullException(nameof(ticketService));
+            _banService = banService ?? throw new ArgumentNullException(nameof(banService));
         }
 
         public async Task HandleButtonInteraction(DiscordClient client, ComponentInteractionCreatedEventArgs e)
@@ -85,7 +86,7 @@ namespace ArtcordBot.Listeners
 
                 case "appeal_ban":
                     await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource,
-                        new DiscordInteractionResponseBuilder().WithContent("Appeal sent."));
+                        new DiscordInteractionResponseBuilder().WithContent("Appeal sent.")); // Placeholder for actual appeal logic
                     break;
 
                 case "close_ticket_confirmation":
@@ -109,6 +110,114 @@ namespace ArtcordBot.Listeners
                             )
                             .AsEphemeral(true));
                     break;
+
+                case "next_banlist_page":
+                {
+                    var originalEmbed = e.Message.Embeds.FirstOrDefault();
+                    int currentPage = 1, totalPages = 1;
+                    if (originalEmbed != null && originalEmbed.Footer != null && !string.IsNullOrEmpty(originalEmbed.Footer.Text))
+                    {
+                        var parts = originalEmbed.Footer.Text.Replace("Page ", "").Split('/');
+                        if (parts.Length == 2)
+                        {
+                            int.TryParse(parts[0].Trim(), out currentPage);
+                            int.TryParse(parts[1].Trim(), out totalPages);
+                        }
+                    }
+
+                    int newPage = currentPage + 1;
+                    if (newPage > totalPages)
+                        newPage = totalPages;
+
+                    var paginatedResult = await _banService.GetBanRecordsAsync(e.Guild.Id, null, null, newPage, 5);
+
+                    var newPageEmbed = new DiscordEmbedBuilder
+                    {
+                        Title = "Ban List",
+                        Color = DiscordColor.Red,
+                        Timestamp = DateTime.UtcNow,
+                    };
+
+                    foreach (var ban in paginatedResult.Records)
+                    {
+                        newPageEmbed.AddField(
+                            $"**User ID:** {ban.UserId}",
+                            $"**Moderator:** <@{ban.ModeratorId}>\n" +
+                            $"**Reason:** {ban.Reason ?? "No reason provided."}\n" +
+                            $"**Date:** {ban.BanDate:yyyy-MM-dd HH:mm:ss}\n" +
+                            $"**Ban ID:** {ban.BanId}",
+                            false);
+                    }
+
+                    newPageEmbed.WithFooter($"Page {paginatedResult.CurrentPage}/{paginatedResult.TotalPages}");
+
+                    bool disablePrevious = paginatedResult.CurrentPage <= 1;
+                    bool disableNext = paginatedResult.CurrentPage >= paginatedResult.TotalPages;
+
+                    var responseBuilder = new DiscordInteractionResponseBuilder()
+                        .AddEmbed(newPageEmbed.Build())
+                        .AddComponents(
+                            new DiscordButtonComponent(DiscordButtonStyle.Primary, "previous_banlist_page", "Previous", disablePrevious),
+                            new DiscordButtonComponent(DiscordButtonStyle.Primary, "next_banlist_page", "Next", disableNext)
+                        );
+
+                    await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage, responseBuilder);
+                    break;
+                }
+
+                case "previous_banlist_page":
+                {
+                    var originalEmbed = e.Message.Embeds.FirstOrDefault();
+                    int currentPage = 1, totalPages = 1;
+                    if (originalEmbed != null && originalEmbed.Footer != null && !string.IsNullOrEmpty(originalEmbed.Footer.Text))
+                    {
+                        var parts = originalEmbed.Footer.Text.Replace("Page ", "").Split('/');
+                        if (parts.Length == 2)
+                        {
+                            int.TryParse(parts[0].Trim(), out currentPage);
+                            int.TryParse(parts[1].Trim(), out totalPages);
+                        }
+                    }
+
+                    int newPage = currentPage - 1;
+                    if (newPage < 1)
+                        newPage = 1;
+
+                    var paginatedResult = await _banService.GetBanRecordsAsync(e.Guild.Id, null, null, newPage, 5);
+
+                    var previousPageEmbed = new DiscordEmbedBuilder
+                    {
+                        Title = "Ban List",
+                        Color = DiscordColor.Red,
+                        Timestamp = DateTime.UtcNow,
+                    };
+
+                    foreach (var ban in paginatedResult.Records)
+                    {
+                        previousPageEmbed.AddField(
+                            $"**User ID:** {ban.UserId}",
+                            $"**Moderator:** <@{ban.ModeratorId}>\n" +
+                            $"**Reason:** {ban.Reason ?? "No reason provided."}\n" +
+                            $"**Date:** {ban.BanDate:yyyy-MM-dd HH:mm:ss}\n" +
+                            $"**Ban ID:** {ban.BanId}",
+                            false);
+                    }
+
+                    previousPageEmbed.WithFooter($"Page {paginatedResult.CurrentPage}/{paginatedResult.TotalPages}");
+
+                    bool disablePrevious = paginatedResult.CurrentPage <= 1;
+                    bool disableNext = paginatedResult.CurrentPage >= paginatedResult.TotalPages;
+
+                    var responseBuilder = new DiscordInteractionResponseBuilder()
+                        .AddEmbed(previousPageEmbed.Build())
+                        .AddComponents(
+                            new DiscordButtonComponent(DiscordButtonStyle.Primary, "previous_banlist_page", "Previous", disablePrevious),
+                            new DiscordButtonComponent(DiscordButtonStyle.Primary, "next_banlist_page", "Next", disableNext)
+                        );
+
+                    await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage, responseBuilder);
+                    break;
+                }
 
                 default:
                     break;

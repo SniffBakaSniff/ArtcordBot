@@ -14,9 +14,8 @@ namespace ArtcordBot.Features.ModerationCommands
         [System.ComponentModel.Description("The user to unban.")]ulong targetUser, 
         [System.ComponentModel.Description("The reason for the unban.")] string? reason = null)
         {
-            
-            // Place DB logic here for unbans
-            //await _databaseService.NewBanRecordAsync();
+
+            await _banService.RemoveBanRecordAsync(ctx.Guild!.Id, targetUser);
 
             await ctx.Guild!.UnbanMemberAsync(targetUser, reason);
 

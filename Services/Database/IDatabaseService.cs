@@ -37,15 +37,7 @@ public interface ITicketService
 
 public interface IBanService
 {
-    Task NewBanRecordAsync(
-        ulong guildId,
-        ulong userId,
-        ulong moderatorId,
-        string? reason = null,
-        string? referenceImagePath = null,
-        ulong? referenceMessageId = null,
-        DateTime? expirationDate = null,
-        AppealStatus? appealStatus = null,
-        DateTime? appealDate = null,
-        string? internalNotes = null);
+    Task NewBanRecordAsync(BanRecord banRecord);
+    Task RemoveBanRecordAsync(ulong id, ulong targetUser);
+    Task<BanService.PaginatedResult<BanRecord>> GetBanRecordsAsync(ulong guildId, ulong? userId = null, int? banId = null, int pageNumber = 1, int pageSize = 5);
 }

@@ -44,20 +44,19 @@ namespace ArtcordBot.Features.ModerationCommands
             }
 
             // Create the ban record in the database
-            await _banService.NewBanRecordAsync(
-                guildId: ctx.Guild!.Id,
-                userId: targetUser.Id,
-                moderatorId: ctx.User.Id,
-                reason: reason,
-                referenceImagePath: referenceImagePath,
-                referenceMessageId: referenceMessageId,
-                internalNotes: internalNotes
-            );
+            await _banService.NewBanRecordAsync(new BanRecord
+            {
+                GuildId = ctx.Guild!.Id,
+                UserId = targetUser.Id,
+                ModeratorId = ctx.User.Id,
+                Reason = reason,
+                ReferenceImagePath = referenceImagePath,
+                ReferenceMessageId = referenceMessageId,
+                InternalNotes = internalNotes
+            });
 
             reason ??= "No reason provided.";
 
-            //Commenting out for testing purposes (dont actually wanna ban people yet)
-            //await ctx.Guild.BanMemberAsync(targetUser, TimeSpan.FromHours((int)deleteTimeframe), reason);
 
             DateTime adjustedTime = DateTime.UtcNow.AddHours(-(int)deleteTimeframe);
 
@@ -98,6 +97,8 @@ namespace ArtcordBot.Features.ModerationCommands
             );
 
             await ctx.RespondAsync(embed: embed.Build());
+            //Commenting out for testing purposes (dont actually wanna ban people yet)
+            //await ctx.Guild.BanMemberAsync(targetUser, TimeSpan.FromHours((int)deleteTimeframe), reason);
         }
     }
 }

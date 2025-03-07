@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 
 
-public class TicketRecords
+public class TicketRecord
 {
     [Key]
     public ulong Id { get; set; }
@@ -22,11 +22,11 @@ public class TicketMessages
 {
     [Key]
     public ulong Id { get; set; }
-    [ForeignKey(nameof(TicketRecords))]
+    [ForeignKey(nameof(TicketRecord))]
     public ulong TicketId { get; set; }
     public ulong UserId { get; set; }
     public TicketMessageType MessageType { get; set; }
     public required string Content { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-    public TicketRecords? TicketRecords { get; set; }
+    public TicketRecord? TicketRecord { get; set; }
 }

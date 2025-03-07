@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 
-public class BanRecords
+public class BanRecord
 {
     [Key]
     public int BanId { get; set; }

@@ -102,7 +102,7 @@ namespace ArtcordBot.Services.Database
             {
                 using (var dbContext = new BotDbContext())
                 {
-                    var newTicketRecord = new TicketRecords
+                    var newTicketRecord = new TicketRecord
                     {
                         GuildId = guildId,
                         ChannelId = channelId,

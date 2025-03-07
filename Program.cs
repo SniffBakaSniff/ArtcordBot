@@ -36,7 +36,7 @@ namespace ArtcordBot
                 });
 
 
-            var buttonInteractionHandler = new ButtonInteractionListener(new TicketService());
+            var buttonInteractionHandler = new ButtonInteractionListener(new TicketService(), new BanService());
             var ticketMessageLogger = new TicketMessageLogger(new TicketService());
             var joinLeaveListener = new JoinLeaveListener(new MessageSettingsService(), new GuildSettingsService());
 
@@ -54,7 +54,12 @@ namespace ArtcordBot
                 // we register our commands here
                 extension =>
                 {
-                    extension.AddCommands([typeof(EchoCommand), typeof(PingCommand), typeof(ConfigCommandsGroup), typeof(ModerationCommandGroup), typeof(TicketCommandGroup)]);
+                    extension.AddCommands([
+                        typeof(EchoCommand),
+                        typeof(PingCommand),
+                        typeof(ConfigCommandsGroup),
+                        typeof(ModerationCommandGroup),
+                        typeof(TicketCommandGroup)]);
                     TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
                     {
                        // PrefixResolver = new DefaultPrefixResolver(true, "?", ".").ResolvePrefixAsync
