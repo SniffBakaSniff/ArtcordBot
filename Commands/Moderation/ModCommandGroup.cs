@@ -11,12 +11,17 @@ namespace ArtcordBot.Features.ModerationCommands
 
         private readonly IBanService _banService;
         private readonly IGuildSettingsService _guildSettingsService;
+        private readonly IPaginationService _paginationService;
 
-        public ModerationCommandGroup(IBanService banService, IGuildSettingsService guildSettingsService)
+        private readonly BotDbContext dbContext = new BotDbContext();
+
+        public ModerationCommandGroup(IBanService banService, IGuildSettingsService guildSettingsService, IPaginationService paginationService)
         {
             _banService = banService;
             _guildSettingsService = guildSettingsService;
             _httpClient = new HttpClient();
+            _paginationService = paginationService;
+
         }
     }
 }

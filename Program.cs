@@ -33,10 +33,11 @@ namespace ArtcordBot
                     services.AddScoped<IGuildSettingsService, GuildSettingsService>();
                     services.AddScoped<IMessageSettingsService, MessageSettingsService>();
                     services.AddScoped<ITicketService, TicketService>();
+                    services.AddScoped<IPaginationService, PaginationService>();
                 });
 
 
-            var buttonInteractionHandler = new ButtonInteractionListener(new TicketService(), new BanService());
+            var buttonInteractionHandler = new ButtonInteractionListener(new TicketService(), new PaginationService());
             var ticketMessageLogger = new TicketMessageLogger(new TicketService());
             var joinLeaveListener = new JoinLeaveListener(new MessageSettingsService(), new GuildSettingsService());
 

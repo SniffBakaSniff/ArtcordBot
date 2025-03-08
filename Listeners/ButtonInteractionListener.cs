@@ -1,3 +1,4 @@
+using System.Runtime.Serialization.Json;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -8,12 +9,13 @@ namespace ArtcordBot.Listeners
     {
 
         private readonly ITicketService _ticketService;
-        private readonly IBanService _banService;
+        private readonly IPaginationService _paginationService;
+        private readonly BotDbContext dbContext = new BotDbContext();
 
-        public ButtonInteractionListener(ITicketService ticketService, IBanService banService)
+        public ButtonInteractionListener(ITicketService ticketService, IPaginationService paginationService)
         {
             _ticketService = ticketService ?? throw new ArgumentNullException(nameof(ticketService));
-            _banService = banService ?? throw new ArgumentNullException(nameof(banService));
+            _paginationService = paginationService ?? throw new ArgumentNullException(nameof(paginationService));
         }
 
         public async Task HandleButtonInteraction(DiscordClient client, ComponentInteractionCreatedEventArgs e)
@@ -129,7 +131,7 @@ namespace ArtcordBot.Listeners
                     if (newPage > totalPages)
                         newPage = totalPages;
 
-                    var paginatedResult = await _banService.GetBanRecordsAsync(e.Guild.Id, null, null, newPage, 5);
+                    var paginatedResult = await _paginationService.GetPaginatedResults(dbContext.BanRecords.Where(p => p.GuildId == e.Guild!.Id), newPage, 5);
 
                     var newPageEmbed = new DiscordEmbedBuilder
                     {
@@ -183,7 +185,7 @@ namespace ArtcordBot.Listeners
                     if (newPage < 1)
                         newPage = 1;
 
-                    var paginatedResult = await _banService.GetBanRecordsAsync(e.Guild.Id, null, null, newPage, 5);
+                    var paginatedResult = await _paginationService.GetPaginatedResults(dbContext.BanRecords.Where(p => p.GuildId == e.Guild!.Id), newPage, 5);
 
                     var previousPageEmbed = new DiscordEmbedBuilder
                     {

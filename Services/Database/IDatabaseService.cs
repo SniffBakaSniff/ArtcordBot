@@ -1,4 +1,5 @@
 using ArtcordBot.Services.Database;
+using static ArtcordBot.Services.Database.PaginationService;
 
 public interface IMessageSettingsService
 {
@@ -39,5 +40,10 @@ public interface IBanService
 {
     Task NewBanRecordAsync(BanRecord banRecord);
     Task RemoveBanRecordAsync(ulong id, ulong targetUser);
-    Task<BanService.PaginatedResult<BanRecord>> GetBanRecordsAsync(ulong guildId, ulong? userId = null, int? banId = null, int pageNumber = 1, int pageSize = 5);
+}
+
+
+public interface IPaginationService
+{
+    Task<PaginatedResult<T>> GetPaginatedResults<T>(IQueryable<T> query, int pageNumber = 1, int pageSize = 5);
 }
