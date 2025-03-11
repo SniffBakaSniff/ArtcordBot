@@ -24,7 +24,7 @@ namespace ArtcordBot.Services.Database
                     switch (messageType)
                     {
                         case MessageType.Appeal:
-                            if (newMessage != null)
+                            if (newMessage is not null)
                             {
                                 settings.AppealMessage = newMessage;
                                 await dbContext.SaveChangesAsync();
@@ -32,7 +32,7 @@ namespace ArtcordBot.Services.Database
                             return settings.AppealMessage;
 
                         case MessageType.Welcome:
-                            if (newMessage != null)
+                            if (newMessage is not null)
                             {
                                 settings.WelcomeMessage = newMessage;
                                 await dbContext.SaveChangesAsync();
@@ -40,7 +40,7 @@ namespace ArtcordBot.Services.Database
                             return settings.WelcomeMessage;
 
                         case MessageType.Farewell:
-                            if (newMessage != null)
+                            if (newMessage is not null)
                             {
                                 settings.FarewellMessage = newMessage;
                                 await dbContext.SaveChangesAsync();
@@ -48,7 +48,7 @@ namespace ArtcordBot.Services.Database
                             return settings.FarewellMessage;
 
                         case MessageType.MutedNotification:
-                            if (newMessage != null)
+                            if (newMessage is not null)
                             {
                                 settings.MutedNotificationMessage = newMessage;
                                 await dbContext.SaveChangesAsync();
@@ -56,7 +56,7 @@ namespace ArtcordBot.Services.Database
                             return settings.MutedNotificationMessage;
 
                         case MessageType.TicketCreation:
-                            if (newMessage != null)
+                            if (newMessage is not null)
                             {
                                 settings.TicketCreationMessage = newMessage;
                                 await dbContext.SaveChangesAsync();
@@ -64,7 +64,7 @@ namespace ArtcordBot.Services.Database
                             return settings.TicketCreationMessage;
 
                         case MessageType.TicketClosure:
-                            if (newMessage != null)
+                            if (newMessage is not null)
                             {
                                 settings.TicketClosureMessage = newMessage;
                                 await dbContext.SaveChangesAsync();
@@ -72,7 +72,7 @@ namespace ArtcordBot.Services.Database
                             return settings.TicketClosureMessage;
 
                         case MessageType.Error:
-                            if (newMessage != null)
+                            if (newMessage is not null)
                             {
                                 settings.ErrorMessage = newMessage;
                             }
@@ -89,7 +89,7 @@ namespace ArtcordBot.Services.Database
         {
             var settings = await dbContext.GuildMessageSettings.FindAsync(guildId);
 
-            if (settings == null)
+            if (settings is null)
             {
                 settings = new GuildMessageSettings { GuildId = guildId };
                 dbContext.GuildMessageSettings.Add(settings);

@@ -40,13 +40,13 @@ namespace ArtcordBot.Features
                 .WithFooter(footer)
                 .WithColor(new DiscordColor(color));
 
-            if (title != null)
+            if (title is not null)
                 embedBuilder.WithTitle(title);
 
-            if (footer != null)
+            if (footer is not null)
                 embedBuilder.WithFooter(footer);
 
-            if (author != null)
+            if (author is not null)
                 embedBuilder.WithAuthor(author.GlobalName, null, author.AvatarUrl);
 
             if (withTimestamp)

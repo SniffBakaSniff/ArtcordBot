@@ -118,7 +118,7 @@ namespace ArtcordBot.Services.Database
         {
             var settings = await dbContext.GuildSettings.FindAsync(guildId);
 
-            if (settings == null)
+            if (settings is null)
             {
                 settings = new GuildSettings { GuildId = guildId };
                 dbContext.GuildSettings.Add(settings);

@@ -12,7 +12,7 @@ namespace ArtcordBot.Features.ModerationCommands
         [System.ComponentModel.Description("The user to Unmute.")] DiscordUser targetUser)
         {
             var mutedRoleId = await _guildSettingsService.GetMutedRoleAsync(ctx.Guild!.Id);
-            if (mutedRoleId == null)
+            if (mutedRoleId is null)
             {
                 await ctx.RespondAsync(MessageHelpers.GenericErrorEmbed("Muted role not set. Please configure the muted role with `/config setmutedrole`."));
                 return;

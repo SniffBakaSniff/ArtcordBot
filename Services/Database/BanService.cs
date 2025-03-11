@@ -24,7 +24,7 @@ namespace ArtcordBot.Services.Database
                 using (var dbContext = new BotDbContext())
                 {
                     var banRecord = await dbContext.BanRecords.FirstOrDefaultAsync(b => b.GuildId == guildId && b.UserId == userId);
-                    if (banRecord != null)
+                    if (banRecord is not null)
                     {
                         dbContext.BanRecords.Remove(banRecord);
                         await dbContext.SaveChangesAsync();

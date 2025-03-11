@@ -1,9 +1,5 @@
-using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
-
 using ArtcordBot.Helpers;
 using DSharpPlus.Commands;
-
-using System.Threading.Tasks;
 using DSharpPlus.Entities;
 
 namespace ArtcordBot.Features.ConfigCommands
@@ -20,7 +16,7 @@ namespace ArtcordBot.Features.ConfigCommands
                 await ctx.RespondAsync("Please Select a Channel");
                 return;
             }
-            if (channel.Type != DiscordChannelType.Text)
+            if (channel.Type is not DiscordChannelType.Text)
             {
                 await ctx.RespondAsync("Please Select a Text Channel");
                 return;
@@ -41,7 +37,7 @@ namespace ArtcordBot.Features.ConfigCommands
                 await ctx.RespondAsync("Please Select a Channel");
                 return;
             }
-            if (channel.Type != DiscordChannelType.Text)
+            if (channel.Type is not DiscordChannelType.Text)
             {
                 await ctx.RespondAsync("Please Select a Text Channel");
                 return;

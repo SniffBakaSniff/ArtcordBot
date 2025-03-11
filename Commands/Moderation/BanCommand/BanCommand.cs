@@ -26,7 +26,7 @@ namespace ArtcordBot.Features.ModerationCommands
 
             // Attachment processing
             string? referenceImagePath = null;
-            if (attachment != null)
+            if (attachment is not null)
             {
                 // Download and save the image
                 string fileName = $"ban_reference_{ctx.Guild!.Id}_{targetUser.Id}_{DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss.fff")}.png";

@@ -1,4 +1,3 @@
-using System.Runtime.Serialization.Json;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -117,7 +116,7 @@ namespace ArtcordBot.Listeners
                 {
                     var originalEmbed = e.Message.Embeds.FirstOrDefault();
                     int currentPage = 1, totalPages = 1;
-                    if (originalEmbed != null && originalEmbed.Footer != null && !string.IsNullOrEmpty(originalEmbed.Footer.Text))
+                    if (originalEmbed is not null && originalEmbed.Footer is not null && !string.IsNullOrEmpty(originalEmbed.Footer.Text))
                     {
                         var parts = originalEmbed.Footer.Text.Replace("Page ", "").Split('/');
                         if (parts.Length == 2)
@@ -171,7 +170,7 @@ namespace ArtcordBot.Listeners
                 {
                     var originalEmbed = e.Message.Embeds.FirstOrDefault();
                     int currentPage = 1, totalPages = 1;
-                    if (originalEmbed != null && originalEmbed.Footer != null && !string.IsNullOrEmpty(originalEmbed.Footer.Text))
+                    if (originalEmbed is not null && originalEmbed.Footer is not null && !string.IsNullOrEmpty(originalEmbed.Footer.Text))
                     {
                         var parts = originalEmbed.Footer.Text.Replace("Page ", "").Split('/');
                         if (parts.Length == 2)
@@ -222,7 +221,7 @@ namespace ArtcordBot.Listeners
                 }
 
                 default:
-                    break;
+                    throw new InvalidOperationException($"Unhandled button interaction: {e.Id}");
             }
         }
     }

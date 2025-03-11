@@ -29,7 +29,7 @@ namespace ArtcordBot.Helpers
             {
                 StringBuilder message = new StringBuilder();
                 message.AppendLine($"Error when attempting to parse argument `{Argument}`.");
-                if (Message != null)
+                if (Message is not null)
                     message.AppendLine($"> {Message}");
                 switch (Type)
                 {

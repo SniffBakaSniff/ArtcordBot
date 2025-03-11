@@ -2,7 +2,6 @@ using DSharpPlus.Commands;
 using DSharpPlus.Entities;
 using DSharpPlus.Commands.ContextChecks;
 using System.ComponentModel;
-using System.Threading.Channels;
 
 namespace ArtcordBot.Features.ModerationCommands
 {
@@ -17,7 +16,7 @@ namespace ArtcordBot.Features.ModerationCommands
             {
                 var paginatedBans = await _paginationService.GetPaginatedResults(dbContext.BanRecords.Where(p => p.GuildId == ctx.Guild!.Id && p.UserId == userId), 1, 5);
 
-                if (paginatedBans.Records == null || !paginatedBans.Records.Any())
+                if (paginatedBans.Records is null)
                 {
                     await ctx.RespondAsync("No bans found for User ID: " + userId.Value + ".");
                     return;
@@ -61,7 +60,7 @@ namespace ArtcordBot.Features.ModerationCommands
             {
                 var paginatedBans = await _paginationService.GetPaginatedResults(dbContext.BanRecords.Where(p => p.GuildId == ctx.Guild!.Id && p.BanId == banId), 1, 5);
 
-                if (paginatedBans.Records == null || !paginatedBans.Records.Any())
+                if (paginatedBans.Records is null)
                 {
                     await ctx.RespondAsync("No bans found for this server.");
                     return;
@@ -92,7 +91,7 @@ namespace ArtcordBot.Features.ModerationCommands
             {
                 var paginatedBans = await _paginationService.GetPaginatedResults(dbContext.BanRecords.Where(p => p.GuildId == ctx.Guild!.Id), 1, 5);
 
-                if (paginatedBans.Records == null || !paginatedBans.Records.Any())
+                if (paginatedBans.Records is null)
                 {
                     await ctx.RespondAsync("No bans found for this server.");
                     return;
