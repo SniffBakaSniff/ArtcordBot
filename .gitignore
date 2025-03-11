@@ -7,3 +7,5 @@ appsettings.json
 /Images
 *.db-wal
 *.db-shm
+fileStructure.py
+/Database/Migrations

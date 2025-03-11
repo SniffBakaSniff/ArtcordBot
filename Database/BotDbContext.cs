@@ -3,7 +3,10 @@ using Microsoft.EntityFrameworkCore;
 public class BotDbContext : DbContext
 {
     public DbSet<GuildSettings> GuildSettings { get; set; }
-    public DbSet<BanRecords> BanRecords { get; set; }
+    public DbSet<GuildMessageSettings> GuildMessageSettings { get; set; }
+    public DbSet<BanRecord> BanRecords { get; set; }
+    public DbSet<TicketRecord> TicketRecords { get; set; }
+    public DbSet<TicketMessages> TicketMessages { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -12,7 +15,6 @@ public class BotDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure your model
         base.OnModelCreating(modelBuilder);
     }
 }

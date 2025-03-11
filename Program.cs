@@ -3,12 +3,14 @@ using DSharpPlus.Entities;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.TextCommands;
 using DSharpPlus.Commands.Processors.SlashCommands;
-using ArtcordAdminBot.Features;
+using ArtcordBot.Features;
 using DSharpPlus.Commands.Processors.TextCommands.Parsing;
-using ArtcordAdminBot.Features.ConfigCommands;
-using ArtcordAdminBot.Features.ModerationCommands;
+using ArtcordBot.Features.ConfigCommands;
+using ArtcordBot.Features.ModerationCommands;
+using ArtcordBot.Listeners;
+using ArtcordBot.Services.Database;
 
-namespace ArtcordAdminBot
+namespace ArtcordBot
 {
     class Program
     {
@@ -22,13 +24,30 @@ namespace ArtcordAdminBot
             }
 
             DiscordClientBuilder builder = DiscordClientBuilder
-                .CreateDefault(discordToken, TextCommandProcessor.RequiredIntents | SlashCommandProcessor.RequiredIntents | DiscordIntents.MessageContents)
+                .CreateDefault(discordToken, TextCommandProcessor.RequiredIntents | SlashCommandProcessor.RequiredIntents | DiscordIntents.MessageContents | DiscordIntents.GuildMembers)
                 .ConfigureServices(services => 
                 {
                     services.AddDbContext<BotDbContext>();
                     services.AddScoped<IPrefixResolver, CustomPrefixResolver>();
-                    services.AddScoped<IDatabaseService, DatabaseService>();
+                    services.AddScoped<IBanService, BanService>();
+                    services.AddScoped<IGuildSettingsService, GuildSettingsService>();
+                    services.AddScoped<IMessageSettingsService, MessageSettingsService>();
+                    services.AddScoped<ITicketService, TicketService>();
+                    services.AddScoped<IPaginationService, PaginationService>();
                 });
+
+
+            var buttonInteractionHandler = new ButtonInteractionListener(new TicketService(), new PaginationService());
+            var ticketMessageLogger = new TicketMessageLogger(new TicketService());
+            var joinLeaveListener = new JoinLeaveListener(new MessageSettingsService(), new GuildSettingsService());
+
+            builder.ConfigureEventHandlers(b =>
+            {
+                b.HandleComponentInteractionCreated(buttonInteractionHandler.HandleButtonInteraction);
+                b.HandleMessageCreated(ticketMessageLogger.LogTicketMessages);
+                b.HandleGuildMemberAdded(joinLeaveListener.OnMemberJoined);
+                b.HandleGuildMemberRemoved(joinLeaveListener.OnMemberLeft);
+            });
 
             // Use the commands extension
             builder.UseCommands
@@ -36,13 +55,16 @@ namespace ArtcordAdminBot
                 // we register our commands here
                 extension =>
                 {
-                    extension.AddCommands([typeof(EchoCommand), typeof(PingCommand), typeof(ConfigCommandsGroup), typeof(ModerationCommandGroup)]);
+                    extension.AddCommands([
+                        typeof(EchoCommand),
+                        typeof(PingCommand),
+                        typeof(ConfigCommandsGroup),
+                        typeof(ModerationCommandGroup),
+                        typeof(TicketCommandGroup)]);
                     TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
                     {
                        // PrefixResolver = new DefaultPrefixResolver(true, "?", ".").ResolvePrefixAsync
                     });
-
-                    
 
                     // Add text commands with a custom prefix (?ping)
                     extension.AddProcessors(textCommandProcessor);
@@ -53,12 +75,11 @@ namespace ArtcordAdminBot
                 
                 new CommandsConfiguration()
                 {
-                    DebugGuildId = 1219490918235901962,
+                    DebugGuildId = 1345544197310255134,
                     RegisterDefaultCommandProcessors = true,
                     UseDefaultCommandErrorHandler = false
                 }
             );
-
 
             DiscordClient client = builder.Build();
 
@@ -68,7 +89,5 @@ namespace ArtcordAdminBot
 
             await Task.Delay(-1);
         }
-
     }
-    
 }

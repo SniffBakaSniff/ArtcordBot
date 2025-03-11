@@ -23,10 +23,10 @@
    - Severity weighting system (0-3) to track and escalate warnings.
    - Notify staff if a user surpasses a certain threshold of weighted points.
 
-3. ❌**Purge Messages**
+3. ✅**Purge Messages**
    - Commands:
      - ✅`/purge [number of messages]`
-     - ❌`/purge until [message link, inclusive]`
+     - ✅`/purge until [message link, inclusive]`
     - [Documentation](Documentation/Commands/purge.md)
 
 4. ❌**Lock System**
