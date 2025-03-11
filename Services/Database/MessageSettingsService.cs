@@ -8,7 +8,9 @@ namespace ArtcordBot.Services.Database
         MutedNotification,
         TicketCreation,
         TicketClosure,
-        Error
+        Error,
+        LockMessage,
+        UnlockMessage
     }
 
     public class MessageSettingsService : IMessageSettingsService
@@ -77,6 +79,22 @@ namespace ArtcordBot.Services.Database
                                 settings.ErrorMessage = newMessage;
                             }
                             return settings.ErrorMessage;
+
+                        case MessageType.LockMessage:
+                            if (newMessage is not null)
+                            {
+                                settings.LockMessage = newMessage;
+                                await dbContext.SaveChangesAsync();
+                            }
+                            return settings.LockMessage;
+
+                        case MessageType.UnlockMessage:
+                            if (newMessage is not null)
+                            {
+                                settings.UnlockMessage = newMessage;
+                                await dbContext.SaveChangesAsync();
+                            }
+                            return settings.UnlockMessage;
 
                         default:
                             throw new ArgumentException("Invalid message type specified.");

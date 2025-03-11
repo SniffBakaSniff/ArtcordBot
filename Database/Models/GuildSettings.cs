@@ -22,4 +22,6 @@ public class GuildMessageSettings
     public string TicketCreationMessage { get; set; } = "Your ticket has been created. Please wait for a moderator to assist you.";
     public string TicketClosureMessage { get; set; } = "Your ticket has been closed. Thank you for your patience!";
     public string ErrorMessage { get; set; } = "An error has occurred. Please try again later.";
+    public string LockMessage { get; set; } = "This channel has been locked by a moderator.";
+    public string UnlockMessage { get; set; } = "This channel has been unlocked by a moderator.";
 }

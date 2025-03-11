@@ -17,6 +17,8 @@ public interface IGuildSettingsService
     Task SetWelcomeChannelAsync(ulong guildId, ulong? welcomeChannelId);
     Task<ulong?> GetFarewellChannelAsync(ulong guildId);
     Task SetFarewellChannelAsync(ulong guildId, ulong? farewellChannelId);
+    Task<string?> GetLockMessageAsync(ulong guildId);
+    Task<string?> GetUnlockMessageAsync(ulong guildId);
 }
 
 public interface ITicketService
