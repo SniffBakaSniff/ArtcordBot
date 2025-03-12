@@ -9,6 +9,8 @@ using ArtcordBot.Features.ConfigCommands;
 using ArtcordBot.Features.ModerationCommands;
 using ArtcordBot.Listeners;
 using ArtcordBot.Services.Database;
+using ArtcordBot.Services;
+using ArtcordBot.Features.GeneralCommands;
 
 namespace ArtcordBot
 {
@@ -34,6 +36,7 @@ namespace ArtcordBot
                     services.AddScoped<IMessageSettingsService, MessageSettingsService>();
                     services.AddScoped<ITicketService, TicketService>();
                     services.AddScoped<IPaginationService, PaginationService>();
+                    services.AddScoped<IStringInterpolatorService, StringInterpolatorService>();
                 });
 
 
@@ -60,7 +63,8 @@ namespace ArtcordBot
                         typeof(PingCommand),
                         typeof(ConfigCommandsGroup),
                         typeof(ModerationCommandGroup),
-                        typeof(TicketCommandGroup)]);
+                        typeof(TicketCommandGroup),
+                        typeof(StringInterpolatorDemo)]);
                     TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
                     {
                        // PrefixResolver = new DefaultPrefixResolver(true, "?", ".").ResolvePrefixAsync
