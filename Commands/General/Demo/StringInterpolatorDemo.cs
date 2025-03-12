@@ -18,7 +18,8 @@ namespace ArtcordBot.Features.GeneralCommands
         [Description("Interpolates a string with context-specific values")]
         public async Task ExecuteAsync(CommandContext ctx, [Description("The string to interpolate")] string template)
         {
-            var interpolatedString = _stringInterpolatorService.Interpolate(template, ctx);
+            var eventContext = new EventContext(ctx);
+            var interpolatedString = _stringInterpolatorService.Interpolate(template, eventContext);
 
             var embed = new DiscordEmbedBuilder
             {

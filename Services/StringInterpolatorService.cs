@@ -1,11 +1,56 @@
-using System.Collections.Generic;
 using DSharpPlus.Commands;
+using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 
 namespace ArtcordBot.Services
 {
+    public interface IContext
+    {
+        DiscordUser User { get; }
+        DiscordChannel Channel { get; }
+        DiscordGuild Guild { get; }
+        DiscordMember Member { get; }
+        string CommandName { get; }
+    }
+
+    public class EventContext : IContext
+    {
+        public DiscordUser User { get; }
+        public DiscordChannel Channel { get; }
+        public DiscordGuild Guild { get; }
+        public DiscordMember Member { get; }
+        public string CommandName { get; } = string.Empty;
+
+        public EventContext(CommandContext ctx)
+        {
+            User = ctx.User;
+            Channel = ctx.Channel;
+            Guild = ctx.Guild!;
+            Member = ctx.Member!;
+            CommandName = ctx.Command.Name;
+        }
+
+        public EventContext(GuildMemberAddedEventArgs e)
+        {
+            User = e.Member;
+            Channel = e.Guild.GetDefaultChannel() ?? throw new InvalidOperationException("Default channel not found");
+            Guild = e.Guild;
+            Member = e.Member;
+        }
+
+        public EventContext(GuildMemberRemovedEventArgs e)
+        {
+            User = e.Member;
+            Channel = e.Guild.GetDefaultChannel() ?? throw new InvalidOperationException("Default channel not found");
+            Guild = e.Guild;
+            Member = e.Member;
+        }
+        
+    }
+
     public class StringInterpolatorService : IStringInterpolatorService
     {
-        public string Interpolate(string template, CommandContext ctx)
+        public string Interpolate(string template, IContext ctx)
         {
             var placeholders = new Dictionary<string, string>
             {
@@ -19,8 +64,7 @@ namespace ArtcordBot.Services
                 { "{{guildid}}", ctx.Guild?.Id.ToString() ?? "DM" },
                 { "{{channelid}}", ctx.Channel.Id.ToString() },
                 { "{{timestamp}}", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") },
-                { "{{command}}", ctx.Command.Name },
-                { "{{args}}", string.Join(", ", ctx.Arguments) }
+                { "{{command}}", ctx.CommandName },
             };
 
             foreach (var placeholder in placeholders)
@@ -34,6 +78,6 @@ namespace ArtcordBot.Services
 
     public interface IStringInterpolatorService
     {
-        string Interpolate(string template, CommandContext ctx);
+        string Interpolate(string template, IContext ctx);
     }
 }

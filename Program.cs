@@ -42,7 +42,7 @@ namespace ArtcordBot
 
             var buttonInteractionHandler = new ButtonInteractionListener(new TicketService(), new PaginationService());
             var ticketMessageLogger = new TicketMessageLogger(new TicketService());
-            var joinLeaveListener = new JoinLeaveListener(new MessageSettingsService(), new GuildSettingsService());
+            var joinLeaveListener = new JoinLeaveListener(new MessageSettingsService(), new GuildSettingsService(), new StringInterpolatorService());
 
             builder.ConfigureEventHandlers(b =>
             {
