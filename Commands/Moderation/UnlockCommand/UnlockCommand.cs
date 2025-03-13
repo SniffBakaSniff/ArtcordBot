@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using ArtcordBot.Helpers;
+using ArtcordBot.Services;
 using DSharpPlus.Commands;
 using DSharpPlus.Entities;
 
@@ -13,16 +15,42 @@ namespace ArtcordBot.Features.ModerationCommands
             var targetChannel = channel ?? ctx.Channel;
             var everyoneRole = ctx.Guild!.EveryoneRole;
             var message = await _guildSettingsService.GetUnlockMessageAsync(ctx.Guild!.Id);
+            var context = new EventContext(ctx);
 
-            await targetChannel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+            message ??= $"🔓 {targetChannel.Mention} has been unlocked.";
+            var embed = MessageHelpers.GenericEmbed("Channel Has Been Unlocked!", message!, "#00ff00");
 
-            if (message is not null)
+            if (channel is not null && channel!.Type == DiscordChannelType.Category)
             {
-                await ctx.RespondAsync(message);
-            }
+                foreach (var child in channel.Children)
+                {
+                    await child.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+
+                    if (message is not null)
+                    {
+                        message = _stringInterpolatorService.Interpolate(message, context);
+
+                        if (child == ctx.Channel)
+                        {
+                            await ctx.RespondAsync(embed);
+                        }
+                        else
+                        {
+                            await child.SendMessageAsync(embed);
+                        }
+                    }
+                }
+            } 
+
             else
             {
-                await ctx.RespondAsync($"🔓 {targetChannel.Mention} has been unlocked.");
+                await targetChannel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+
+                if (message is not null)
+                {
+                    message = _stringInterpolatorService.Interpolate(message, context);
+                    await ctx.RespondAsync(embed);
+                }
             }
         }
     }
