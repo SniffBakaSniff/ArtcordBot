@@ -11,6 +11,7 @@ using ArtcordBot.Listeners;
 using ArtcordBot.Services.Database;
 using ArtcordBot.Services;
 using ArtcordBot.Features.GeneralCommands;
+using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 
 namespace ArtcordBot
 {
@@ -37,6 +38,7 @@ namespace ArtcordBot
                     services.AddScoped<ITicketService, TicketService>();
                     services.AddScoped<IPaginationService, PaginationService>();
                     services.AddScoped<IStringInterpolatorService, StringInterpolatorService>();
+                    services.AddScoped<IGuildPresetService, GuildPresetService>();
                 });
 
 

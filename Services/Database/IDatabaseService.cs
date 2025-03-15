@@ -49,3 +49,11 @@ public interface IPaginationService
 {
     Task<PaginatedResult<T>> GetPaginatedResults<T>(IQueryable<T> query, int pageNumber = 1, int pageSize = 5);
 }
+
+public interface IGuildPresetService
+{
+    Task SetPresetChannelsAsync(ulong guildId, string name, string channels);
+    Task<string?> GetPresetChannelsAsync(ulong guildId, string name);
+    Task<string?> GetPresetNamesAsync(ulong guildId);
+    Task RemovePresetChannelsAsync(ulong guildId, string name);
+}
