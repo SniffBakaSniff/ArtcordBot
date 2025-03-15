@@ -11,7 +11,7 @@ namespace ArtcordBot.Features.ModerationCommands
     {
         [Command("unlock")]
         [Description("Unlocks a channel or the whole server.")]
-        public async Task UnlockAsync(CommandContext ctx, DiscordChannel? channel = null, [SlashAutoCompleteProvider(typeof(PresetNameAutoCompleteProvider))] string? preset = null)
+        public async Task UnlockAsync(CommandContext ctx, DiscordChannel? channel = null, [SlashAutoCompleteProvider(typeof(PresetNameAutoCompleteProvider))] string? preset = null, bool guild = false)
         {
             var targetChannel = channel ?? ctx.Channel;
             var everyoneRole = ctx.Guild!.EveryoneRole;
@@ -19,9 +19,10 @@ namespace ArtcordBot.Features.ModerationCommands
             var context = new EventContext(ctx);
 
             message ??= $"🔓 {targetChannel.Mention} has been unlocked.";
+            message = _stringInterpolatorService.Interpolate(message, context);
             var embed = MessageHelpers.GenericEmbed("Channel Has Been Unlocked!", message!, "#00ff00");
 
-            if (channel is not null && channel!.Type == DiscordChannelType.Category)
+            if (channel is not null && channel.Type == DiscordChannelType.Category)
             {
                 foreach (var child in channel.Children)
                 {
@@ -29,8 +30,6 @@ namespace ArtcordBot.Features.ModerationCommands
 
                     if (message is not null)
                     {
-                        message = _stringInterpolatorService.Interpolate(message, context);
-
                         if (child == ctx.Channel)
                         {
                             await ctx.RespondAsync(embed);
@@ -51,15 +50,29 @@ namespace ArtcordBot.Features.ModerationCommands
                 foreach (ulong presetChannels in channelIds)
                 {
                     channel = await ctx.Guild.GetChannelAsync(presetChannels);
-                    await channel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
-                    if (channel == ctx.Channel)
+                    
+                    if (channel is not null && channel!.Type == DiscordChannelType.Category)
+                    {
+                        foreach (var child in channel.Children)
                         {
-                            await ctx.RespondAsync(embed);
+                            await channel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+
+                            if (message is not null)
+                            {
+                                if (child == ctx.Channel)
+                                {
+                                    await ctx.RespondAsync(embed);
+                                }
+                                else
+                                {
+                                    await child.SendMessageAsync(embed);
+                                }
+                            }
                         }
-                        else
-                        {
-                            await channel.SendMessageAsync(embed);
-                        }
+                        break;
+                    }
+
+                    await channel!.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
                 }
 
                 if (!channelIds.Contains(ctx.Channel.Id))
@@ -70,13 +83,34 @@ namespace ArtcordBot.Features.ModerationCommands
                 }
             }
 
+            if (guild is true)
+            {
+                var channels = await ctx.Guild.GetChannelsAsync();
+
+                foreach (var child in channels)
+                {
+                    await child!.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+
+                    if (child.Type is not DiscordChannelType.Category)
+                    {
+                        if (child == ctx.Channel)
+                        {
+                            await ctx.RespondAsync(embed);
+                        }
+                        else
+                        {
+                            await child.SendMessageAsync(embed);
+                        }
+                    }
+                }
+            }
+
             else
             {
                 await targetChannel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
 
                 if (message is not null)
                 {
-                    message = _stringInterpolatorService.Interpolate(message, context);
                     await ctx.RespondAsync(embed);
                 }
             }

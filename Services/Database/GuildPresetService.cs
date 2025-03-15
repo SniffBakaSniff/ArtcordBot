@@ -11,7 +11,7 @@ namespace ArtcordBot.Services.Database
             {
                 using(var dbContext = new BotDbContext())
                 {
-                    var settings = await GuildPresetsAsync(dbContext, guildId);
+                    var settings = await GuildPresetsAsync(dbContext, guildId, name);
                     settings.Name = name;
                     settings.Channels = channels;
                     await dbContext.SaveChangesAsync();
@@ -31,16 +31,18 @@ namespace ArtcordBot.Services.Database
             });
         }
 
-        public async Task<string?> GetPresetNamesAsync(ulong guildId)
+        public async Task<List<string?>> GetPresetNamesAsync(ulong guildId)
         {
             return await ExceptionHandler.HandleAsync(async () => 
             {
                 using (var dbContext = new BotDbContext())
                 {
-                    var settings = await dbContext.GuildPresets.FindAsync(guildId);
-                    return settings?.Name;
+                    return await dbContext.GuildPresets
+                        .Where(p => p.GuildId == guildId)
+                        .Select(p => p.Name)
+                        .ToListAsync();
                 }
-            });
+            }) ?? [];
         }
 
         public async Task RemovePresetChannelsAsync(ulong guildId, string name)
@@ -59,9 +61,9 @@ namespace ArtcordBot.Services.Database
             });
         }
 
-        private async Task<GuildPresets> GuildPresetsAsync(BotDbContext dbContext, ulong guildId)
+        private async Task<GuildPresets> GuildPresetsAsync(BotDbContext dbContext, ulong guildId, string name)
         {
-            var settings = await dbContext.GuildPresets.FindAsync(guildId);
+            var settings = await dbContext.GuildPresets.FirstOrDefaultAsync(b => b.GuildId == guildId && b.Name == name);
 
             if (settings is null)
             {

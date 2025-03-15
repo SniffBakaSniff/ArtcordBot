@@ -9,17 +9,15 @@ public class PresetNameAutoCompleteProvider : IAutoCompleteProvider
             return new Dictionary<string, object>();
 
         var guildId = context.Guild!.Id;
-        var presetNamesCsv = await presetService.GetPresetNamesAsync(guildId);
+        var presetNames = await presetService.GetPresetNamesAsync(guildId) ?? [];
 
-        presetNamesCsv ??= "";
 
-        IEnumerable<string> presetNames = presetNamesCsv!.Split(',').Select(name => name.Trim()).Where(name => !string.IsNullOrWhiteSpace(name));
 
         string userInput = context.UserInput ?? string.Empty;
     
         var choices = presetNames
-            .Where(name => name.StartsWith(userInput, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(name => name, name => (object)name);
+            .Where(name => !string.IsNullOrEmpty(name) && name.StartsWith(userInput, StringComparison.OrdinalIgnoreCase))
+            .ToDictionary(name => name!, name => (object)name!);
 
         return choices;
     }

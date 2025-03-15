@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 public class GuildPresets 
 {
     [Key]
+    public int PresetId { get; set; }
     public ulong GuildId { get; set; }
     public string? Name { get; set; }
     public string? Channels { get; set; }
