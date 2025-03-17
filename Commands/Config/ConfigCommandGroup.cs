@@ -12,13 +12,15 @@ namespace ArtcordBot.Features.ConfigCommands
         private readonly IGuildSettingsService _guildSettingsService;
         private readonly IMessageSettingsService _messageSettingsService;
         private readonly IGuildPresetService _guildPresetService;
+        private readonly IPaginationService _paginationService;
         private readonly BotDbContext dbContext = new BotDbContext();
 
-        public ConfigCommandsGroup(IGuildSettingsService guildSettingsService, IMessageSettingsService messageSettingsService, IGuildPresetService guildPresetService)
+        public ConfigCommandsGroup(IGuildSettingsService guildSettingsService, IMessageSettingsService messageSettingsService, IGuildPresetService guildPresetService, IPaginationService paginationService)
         {
             _guildSettingsService = guildSettingsService;
             _messageSettingsService = messageSettingsService;
             _guildPresetService = guildPresetService;
+            _paginationService = paginationService;
         }
     }
 }

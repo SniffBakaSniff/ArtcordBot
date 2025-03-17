@@ -5,7 +5,7 @@ namespace ArtcordBot.Services.Database
     public class GuildPresetService : IGuildPresetService
     {
         
-        public async Task SetPresetChannelsAsync(ulong guildId, string name, string channels)
+        public async Task AddPresetAsync(ulong guildId, string name, string? channels, string? members)
         {
             await ExceptionHandler.HandleAsync(async () => 
             {
@@ -14,19 +14,39 @@ namespace ArtcordBot.Services.Database
                     var settings = await GuildPresetsAsync(dbContext, guildId, name);
                     settings.Name = name;
                     settings.Channels = channels;
+                    settings.Members = members;
                     await dbContext.SaveChangesAsync();
                 }
             });
         }
 
-        public async Task<string?> GetPresetChannelsAsync(ulong guildId, string name)
+        public async Task<GuildPresets?> GetPresetAsync(ulong guildId, string name)
+        {
+            return await ExceptionHandler.HandleAsync(async() =>
+            {
+                using (var dbContext = new BotDbContext())
+                {
+                    return await dbContext.GuildPresets.FirstOrDefaultAsync(b => b.GuildId == guildId && b.Name == name);
+                }
+            });
+        }
+
+        public async Task<ulong[]?> GetPresetChannelsAsync(ulong guildId, string name)
         {
             return await ExceptionHandler.HandleAsync(async () => 
             {
                 using (var dbContext = new BotDbContext())
                 {
-                    var settings = await dbContext.GuildPresets.FirstOrDefaultAsync(b => b.GuildId == guildId && b.Name == name);
-                    return settings?.Channels;
+                    var presets = await dbContext.GuildPresets.FirstOrDefaultAsync(b => b.GuildId == guildId && b.Name == name);
+                    ulong[] channelIds = presets!.Channels!
+                        .Replace("<", "")
+                        .Replace("#", "")
+                        .Replace(">", "")
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(ulong.Parse)
+                        .ToArray();
+
+                    return channelIds;
                 }
             });
         }
@@ -55,6 +75,25 @@ namespace ArtcordBot.Services.Database
                     if (preset is not null)
                     {
                         dbContext.GuildPresets.Remove(preset);
+                        await dbContext.SaveChangesAsync();
+                    }
+                }
+            });
+        }
+
+        public async Task EditPresetAsync(ulong guildId, string name, string? newName, string? channels, string? members)
+        {
+            await ExceptionHandler.HandleAsync(async() =>
+            {
+                using (var dbContext = new BotDbContext())
+                {
+                    var preset = await dbContext.GuildPresets.FirstOrDefaultAsync(b => b.GuildId == guildId && b.Name == name);
+
+                    if (preset is not null)
+                    {
+                        preset.Name = newName;
+                        preset.Channels = channels;
+                        preset.Members = members;
                         await dbContext.SaveChangesAsync();
                     }
                 }

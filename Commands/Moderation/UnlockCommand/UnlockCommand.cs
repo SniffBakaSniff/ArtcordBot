@@ -2,16 +2,16 @@ using System.ComponentModel;
 using ArtcordBot.Helpers;
 using ArtcordBot.Services;
 using DSharpPlus.Commands;
-using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 
 namespace ArtcordBot.Features.ModerationCommands
 {
-    public partial class ModerationCommandGroup 
+    public partial class ModerationCommandGroup
     {
         [Command("unlock")]
-        [Description("Unlocks a channel or the whole server.")]
-        public async Task UnlockAsync(CommandContext ctx, DiscordChannel? channel = null, [SlashAutoCompleteProvider(typeof(PresetNameAutoCompleteProvider))] string? preset = null, bool guild = false)
+        [Description("Unlocks a channel or a group of preset channels.")]
+        public async Task UnlockAsync(CommandContext ctx, DiscordChannel? channel = null, [SlashAutoCompleteProvider(typeof(PresetNameAutoCompleteProvider))] string? preset = null)
         {
             var targetChannel = channel ?? ctx.Channel;
             var everyoneRole = ctx.Guild!.EveryoneRole;
@@ -22,98 +22,88 @@ namespace ArtcordBot.Features.ModerationCommands
             message = _stringInterpolatorService.Interpolate(message, context);
             var embed = MessageHelpers.GenericEmbed("Channel Has Been Unlocked!", message!, "#00ff00");
 
-            if (channel is not null && channel.Type == DiscordChannelType.Category)
+            if (channel is not null && preset is not null)
             {
-                foreach (var child in channel.Children)
-                {
-                    await child.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+                await ctx.RespondAsync(MessageHelpers.GenericErrorEmbed(
+                    title: "Multiple Parameters Selected!",
+                    message: "Please select either **channel** or **preset**, you cannot select both."));
+                return;
+            }
 
-                    if (message is not null)
-                    {
-                        if (child == ctx.Channel)
-                        {
-                            await ctx.RespondAsync(embed);
-                        }
-                        else
-                        {
-                            await child.SendMessageAsync(embed);
-                        }
-                    }
-                }
+            if (channel is not null)
+            {
+                await UnlockCategoryAsync(channel, everyoneRole, embed, ctx, sendResponse: true);
+                return;
             }
 
             if (preset is not null)
             {
-                string? channels = await _guildPresetService.GetPresetChannelsAsync(ctx.Guild.Id, preset) ?? string.Empty;
-                ulong[] channelIds = channels!.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(ulong.Parse).ToArray();
-                
-                foreach (ulong presetChannels in channelIds)
-                {
-                    channel = await ctx.Guild.GetChannelAsync(presetChannels);
-                    
-                    if (channel is not null && channel!.Type == DiscordChannelType.Category)
-                    {
-                        foreach (var child in channel.Children)
-                        {
-                            await channel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
-
-                            if (message is not null)
-                            {
-                                if (child == ctx.Channel)
-                                {
-                                    await ctx.RespondAsync(embed);
-                                }
-                                else
-                                {
-                                    await child.SendMessageAsync(embed);
-                                }
-                            }
-                        }
-                        break;
-                    }
-
-                    await channel!.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
-                }
-
-                if (!channelIds.Contains(ctx.Channel.Id))
-                {
-                    message = $"All channels for the {preset} preset have been unlocked.";
-                    embed = MessageHelpers.GenericEmbed($"Channels have been unlocked!", message, "00ff00");
-                    await ctx.RespondAsync(embed);
-                }
+                await UnlockPresetChannelsAsync(ctx, preset, everyoneRole, embed);
+                return;
             }
 
-            if (guild is true)
+            await targetChannel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+            await ctx.RespondAsync(embed);
+        }
+
+        private async Task UnlockCategoryAsync(DiscordChannel channel, DiscordRole everyoneRole, DiscordEmbed embed, CommandContext ctx, bool sendResponse = true)
+        {
+            if (channel.Type == DiscordChannelType.Category)
             {
-                var channels = await ctx.Guild.GetChannelsAsync();
-
-                foreach (var child in channels)
+                foreach (var child in channel.Children)
                 {
-                    await child!.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+                    await UnlockSingleChannelAsync(child, everyoneRole, embed, ctx, sendResponse: false);
+                }
 
-                    if (child.Type is not DiscordChannelType.Category)
-                    {
-                        if (child == ctx.Channel)
-                        {
-                            await ctx.RespondAsync(embed);
-                        }
-                        else
-                        {
-                            await child.SendMessageAsync(embed);
-                        }
-                    }
+                if (sendResponse)
+                {
+                    var categoryEmbed = MessageHelpers.GenericEmbed(
+                        $"Category: {channel.Mention} has been unlocked!",
+                        $"All channels within {channel.Mention} have been unlocked.",
+                        "#00ff00");
+                    await ctx.RespondAsync(categoryEmbed);
                 }
             }
-
             else
             {
-                await targetChannel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
-
-                if (message is not null)
+                await UnlockSingleChannelAsync(channel, everyoneRole, embed, ctx, sendResponse: sendResponse);
+                if (sendResponse)
                 {
                     await ctx.RespondAsync(embed);
                 }
             }
+        }
+
+        private async Task UnlockSingleChannelAsync(DiscordChannel channel, DiscordRole everyoneRole, DiscordEmbed embed, CommandContext ctx, bool sendResponse = true)
+        {
+            if (channel.Type == DiscordChannelType.Text)
+            {
+                await channel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.SendMessages);
+                if (sendResponse && channel != ctx.Channel)
+                {
+                    await channel.SendMessageAsync(embed);
+                }
+            }
+            else if (channel.Type == DiscordChannelType.Voice)
+            {
+                await channel.AddOverwriteAsync(everyoneRole, allow: DiscordPermissions.UseVoice);
+            }
+        }
+
+        private async Task UnlockPresetChannelsAsync(CommandContext ctx, string preset, DiscordRole everyoneRole, DiscordEmbed embed)
+        {
+            ulong[] channelIds = await _guildPresetService.GetPresetChannelsAsync(ctx.Guild!.Id, preset) ?? [];
+            foreach (ulong presetChannelId in channelIds)
+            {
+                var channel = await ctx.Guild.GetChannelAsync(presetChannelId);
+                await UnlockCategoryAsync(channel, everyoneRole, embed, ctx, sendResponse: false);
+            }
+
+            var presetEmbed = MessageHelpers.GenericEmbed(
+                $"Channels have been unlocked!",
+                $"All channels for the **{preset}** preset have been unlocked.",
+                "#00ff00");
+            await ctx.RespondAsync(presetEmbed);
         }
     }
 }

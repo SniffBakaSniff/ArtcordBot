@@ -52,8 +52,10 @@ public interface IPaginationService
 
 public interface IGuildPresetService
 {
-    Task SetPresetChannelsAsync(ulong guildId, string name, string channels);
-    Task<string?> GetPresetChannelsAsync(ulong guildId, string name);
+    Task AddPresetAsync(ulong guildId, string name, string? channels, string? members);
+    Task<GuildPresets?> GetPresetAsync(ulong guildId, string name);
+    Task<ulong[]?> GetPresetChannelsAsync(ulong guildId, string name);
     Task<List<string?>> GetPresetNamesAsync(ulong guildId);
     Task RemovePresetChannelsAsync(ulong guildId, string name);
+    Task EditPresetAsync(ulong guildId, string name, string? newName, string? channels, string? members);
 }
