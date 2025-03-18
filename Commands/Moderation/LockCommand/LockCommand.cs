@@ -68,7 +68,9 @@ namespace ArtcordBot.Features.ModerationCommands
             {
                 await LockSingleChannelAsync(channel, everyoneRole, embed, ctx, sendResponse: sendResponse);
                 if (sendResponse)
+                {
                     await ctx.RespondAsync(embed);
+                }
             }
         }
 

@@ -27,7 +27,7 @@ namespace ArtcordBot.Features.ConfigCommands
                     title:"Preset Name Taken!",
                     message:$"The preset name ``{name}`` is already in use. Please choose a different name."
                 );
-                
+
                 await ctx.RespondAsync(embed);
             }
             else
@@ -57,7 +57,6 @@ namespace ArtcordBot.Features.ConfigCommands
 
             await ctx.RespondAsync(embed);
         }
-
 
         [Command("removePreset")]
         public async Task RemovePreset(CommandContext ctx, [SlashAutoCompleteProvider(typeof(PresetNameAutoCompleteProvider))] string name)
@@ -115,6 +114,4 @@ namespace ArtcordBot.Features.ConfigCommands
                 await ctx.RespondAsync(messageBuilder);
         }
     }
-
-
 }

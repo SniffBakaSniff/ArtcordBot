@@ -91,9 +91,20 @@ namespace ArtcordBot.Services.Database
 
                     if (preset is not null)
                     {
-                        preset.Name = newName;
-                        preset.Channels = channels;
-                        preset.Members = members;
+                        if (newName is not null)
+                        {
+                            preset.Name = newName;
+                        }
+
+                        if (channels is not null)
+                        {
+                            preset.Channels = channels;
+                        }
+
+                        if (members is not null)
+                        {
+                            preset.Members = members;
+                        }
                         await dbContext.SaveChangesAsync();
                     }
                 }
