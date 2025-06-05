@@ -11,19 +11,12 @@ namespace ArtcordBot.Features.ConfigCommands
         [Command("addPreset")]
         public async Task AddPreset(CommandContext ctx, string name, string? channels = null, string? members = null)
         {
-            var embed = MessageHelpers.GenericAddedPresetEmbed(
-                $"Preset {name} Added!",
-                $"Channels: {channels}\nMembers: {members}"
-            );
-
-            channels ??= "None";
-            members ??= "None";
 
             var preset = await _guildPresetService.GetPresetAsync(ctx.Guild!.Id, name);
 
             if (preset is not null)
             {
-                embed = MessageHelpers.GenericErrorEmbed(
+                var embed = MessageHelpers.GenericErrorEmbed(
                     title:"Preset Name Taken!",
                     message:$"The preset name ``{name}`` is already in use. Please choose a different name."
                 );
@@ -33,6 +26,15 @@ namespace ArtcordBot.Features.ConfigCommands
             else
             {
                 await _guildPresetService.AddPresetAsync(ctx.Guild!.Id, name, channels, members);
+
+                var embed = MessageHelpers.GenericAddedPresetEmbed(
+                $"Preset {name} Added!",
+                $"Channels: {channels}\nMembers: {members}"
+                );
+
+                channels ??= "None";
+                members ??= "None";
+                
                 await ctx.RespondAsync(embed);
             }
         }
