@@ -114,6 +114,30 @@ namespace ArtcordBot.Services.Database
             });
         }
 
+        public async Task<string?> GetLockMessageAsync(ulong guildId)
+        {
+            return await ExceptionHandler.HandleAsync(async () =>
+            {
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await GuildMessageSettingsAsync(dbContext, guildId);
+                    return settings.LockMessage;
+                }
+            });
+        }
+
+        public async Task<string?> GetUnlockMessageAsync(ulong guildId)
+        {
+            return await ExceptionHandler.HandleAsync(async () =>
+            {
+                using (var dbContext = new BotDbContext())
+                {
+                    var settings = await GuildMessageSettingsAsync(dbContext, guildId);
+                    return settings.UnlockMessage;
+                }
+            });
+        }
+
         private async Task<GuildSettings> GuildSettingsAsync(BotDbContext dbContext, ulong guildId)
         {
             var settings = await dbContext.GuildSettings.FindAsync(guildId);
@@ -122,6 +146,19 @@ namespace ArtcordBot.Services.Database
             {
                 settings = new GuildSettings { GuildId = guildId };
                 dbContext.GuildSettings.Add(settings);
+            }
+
+            return settings;
+        }
+
+        private async Task<GuildMessageSettings> GuildMessageSettingsAsync(BotDbContext dbContext, ulong guildId)
+        {
+            var settings = await dbContext.GuildMessageSettings.FindAsync(guildId);
+
+            if (settings is null)
+            {
+                settings = new GuildMessageSettings { GuildId = guildId };
+                dbContext.GuildMessageSettings.Add(settings);
             }
 
             return settings;

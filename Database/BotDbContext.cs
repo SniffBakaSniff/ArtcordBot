@@ -7,6 +7,7 @@ public class BotDbContext : DbContext
     public DbSet<BanRecord> BanRecords { get; set; }
     public DbSet<TicketRecord> TicketRecords { get; set; }
     public DbSet<TicketMessages> TicketMessages { get; set; }
+    public DbSet<GuildPresets> GuildPresets { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

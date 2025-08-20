@@ -9,6 +9,9 @@ using ArtcordBot.Features.ConfigCommands;
 using ArtcordBot.Features.ModerationCommands;
 using ArtcordBot.Listeners;
 using ArtcordBot.Services.Database;
+using ArtcordBot.Services;
+using ArtcordBot.Features.GeneralCommands;
+using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 
 namespace ArtcordBot
 {
@@ -34,12 +37,14 @@ namespace ArtcordBot
                     services.AddScoped<IMessageSettingsService, MessageSettingsService>();
                     services.AddScoped<ITicketService, TicketService>();
                     services.AddScoped<IPaginationService, PaginationService>();
+                    services.AddScoped<IStringInterpolatorService, StringInterpolatorService>();
+                    services.AddScoped<IGuildPresetService, GuildPresetService>();
                 });
 
 
             var buttonInteractionHandler = new ButtonInteractionListener(new TicketService(), new PaginationService());
             var ticketMessageLogger = new TicketMessageLogger(new TicketService());
-            var joinLeaveListener = new JoinLeaveListener(new MessageSettingsService(), new GuildSettingsService());
+            var joinLeaveListener = new JoinLeaveListener(new MessageSettingsService(), new GuildSettingsService(), new StringInterpolatorService());
 
             builder.ConfigureEventHandlers(b =>
             {
@@ -60,7 +65,8 @@ namespace ArtcordBot
                         typeof(PingCommand),
                         typeof(ConfigCommandsGroup),
                         typeof(ModerationCommandGroup),
-                        typeof(TicketCommandGroup)]);
+                        typeof(TicketCommandGroup),
+                        typeof(StringInterpolatorDemo)]);
                     TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
                     {
                        // PrefixResolver = new DefaultPrefixResolver(true, "?", ".").ResolvePrefixAsync

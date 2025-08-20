@@ -220,6 +220,102 @@ namespace ArtcordBot.Listeners
                     break;
                 }
 
+                case "next_presetlist_page":
+                {
+                    var originalEmbed = e.Message.Embeds.FirstOrDefault();
+                    int currentPage = 1, totalPages = 1;
+                    if (originalEmbed is not null && originalEmbed.Footer is not null && !string.IsNullOrEmpty(originalEmbed.Footer.Text))
+                    {
+                        var parts = originalEmbed.Footer.Text.Replace("Page ", "").Split('/');
+                        if (parts.Length == 2)
+                        {
+                            int.TryParse(parts[0].Trim(), out currentPage);
+                            int.TryParse(parts[1].Trim(), out totalPages);
+                        }
+                    }
+
+                    int newPage = currentPage + 1;
+                    if (newPage > totalPages)
+                        newPage = totalPages;
+
+                    var paginatedResult = await _paginationService.GetPaginatedResults(dbContext.GuildPresets.Where(p => p.GuildId == e.Guild!.Id), newPage, 5);
+
+                    var newPageEmbed = new DiscordEmbedBuilder
+                    {
+                        Title = "Presets",
+                        Color = DiscordColor.Aquamarine,
+                        Timestamp = DateTime.UtcNow,
+                    };
+
+                    foreach (var preset in paginatedResult.Records)
+                    {
+                        newPageEmbed.AddField($"{preset.Name}", $"Channels: {preset.Channels}\nMembers: {preset.Members}");
+                    }
+
+                    newPageEmbed.WithFooter($"Page {paginatedResult.CurrentPage}/{paginatedResult.TotalPages}");
+
+                    bool disablePrevious = paginatedResult.CurrentPage <= 1;
+                    bool disableNext = paginatedResult.CurrentPage >= paginatedResult.TotalPages;
+
+                    var responseBuilder = new DiscordInteractionResponseBuilder()
+                        .AddEmbed(newPageEmbed.Build())
+                        .AddComponents(
+                            new DiscordButtonComponent(DiscordButtonStyle.Primary, "previous_presetlist_page", "Previous", disablePrevious),
+                            new DiscordButtonComponent(DiscordButtonStyle.Primary, "next_presetlist_page", "Next", disableNext)
+                        );
+
+                    await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage, responseBuilder);
+                    break;
+                }
+
+                case "previous_presetlist_page":
+                {
+                    var originalEmbed = e.Message.Embeds.FirstOrDefault();
+                    int currentPage = 1, totalPages = 1;
+                    if (originalEmbed is not null && originalEmbed.Footer is not null && !string.IsNullOrEmpty(originalEmbed.Footer.Text))
+                    {
+                        var parts = originalEmbed.Footer.Text.Replace("Page ", "").Split('/');
+                        if (parts.Length == 2)
+                        {
+                            int.TryParse(parts[0].Trim(), out currentPage);
+                            int.TryParse(parts[1].Trim(), out totalPages);
+                        }
+                    }
+
+                    int newPage = currentPage - 1;
+                    if (newPage > totalPages)
+                        newPage = totalPages;
+
+                    var paginatedResult = await _paginationService.GetPaginatedResults(dbContext.GuildPresets.Where(p => p.GuildId == e.Guild!.Id), newPage, 5);
+
+                    var newPageEmbed = new DiscordEmbedBuilder
+                    {
+                        Title = "Presets",
+                        Color = DiscordColor.Aquamarine,
+                        Timestamp = DateTime.UtcNow,
+                    };
+
+                    foreach (var preset in paginatedResult.Records)
+                    {
+                        newPageEmbed.AddField($"{preset.Name}", $"Channels: {preset.Channels}\nMembers: {preset.Members}");
+                    }
+
+                    newPageEmbed.WithFooter($"Page {paginatedResult.CurrentPage}/{paginatedResult.TotalPages}");
+
+                    bool disablePrevious = paginatedResult.CurrentPage <= 1;
+                    bool disableNext = paginatedResult.CurrentPage >= paginatedResult.TotalPages;
+
+                    var responseBuilder = new DiscordInteractionResponseBuilder()
+                        .AddEmbed(newPageEmbed.Build())
+                        .AddComponents(
+                            new DiscordButtonComponent(DiscordButtonStyle.Primary, "previous_presetlist_page", "Previous", disablePrevious),
+                            new DiscordButtonComponent(DiscordButtonStyle.Primary, "next_presetlist_page", "Next", disableNext)
+                        );
+
+                    await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage, responseBuilder);
+                    break;
+                }
+
                 default:
                     throw new InvalidOperationException($"Unhandled button interaction: {e.Id}");
             }

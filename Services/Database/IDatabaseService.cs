@@ -17,6 +17,8 @@ public interface IGuildSettingsService
     Task SetWelcomeChannelAsync(ulong guildId, ulong? welcomeChannelId);
     Task<ulong?> GetFarewellChannelAsync(ulong guildId);
     Task SetFarewellChannelAsync(ulong guildId, ulong? farewellChannelId);
+    Task<string?> GetLockMessageAsync(ulong guildId);
+    Task<string?> GetUnlockMessageAsync(ulong guildId);
 }
 
 public interface ITicketService
@@ -46,4 +48,14 @@ public interface IBanService
 public interface IPaginationService
 {
     Task<PaginatedResult<T>> GetPaginatedResults<T>(IQueryable<T> query, int pageNumber = 1, int pageSize = 5);
+}
+
+public interface IGuildPresetService
+{
+    Task AddPresetAsync(ulong guildId, string name, string? channels, string? members);
+    Task<GuildPresets?> GetPresetAsync(ulong guildId, string name);
+    Task<ulong[]?> GetPresetChannelsAsync(ulong guildId, string name);
+    Task<List<string?>> GetPresetNamesAsync(ulong guildId);
+    Task RemovePresetChannelsAsync(ulong guildId, string name);
+    Task EditPresetAsync(ulong guildId, string name, string? newName, string? channels, string? members);
 }

@@ -14,7 +14,7 @@ namespace ArtcordBot
             if (message.Length > 4096 - 5)
                 message = message.Substring(0, 4096 - 5) + "…";
 
-            await e.Context.RespondAsync(MessageHelpers.GenericErrorEmbed(message + "\n```", title: "Error (D#+)"));
+            await e.Context.Channel.SendMessageAsync(MessageHelpers.GenericErrorEmbed(message + "\n```", title: "Error (D#+)"));
         }
     }
 }
